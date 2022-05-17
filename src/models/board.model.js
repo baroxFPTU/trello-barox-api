@@ -18,12 +18,18 @@ const createNew = async (newBoard) => {
   try {
     const validBoard = await validateSchema(newBoard)
     const result = await getDB().collection(boardCollectionName).insertOne(validBoard)
-    console.log(result)
+    return result
   } catch (error) {
-    console.error(error) //which invalid will come here
+    throw new Error(error)
   }
 }
 
 export const BoardModel = {
   createNew
 }
+
+/*
+cái hay học từ Joi
+- thay vì cho một validate function, return result thông báo hợp lệ hoặc không.
+=> thì có lỗi => bắn lỗi (Throw error) => bắt lỗi với trycatch. Còn đúng, thì vẫn chạy từ trên xuống như bình thường.
+*/
