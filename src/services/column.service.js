@@ -1,9 +1,12 @@
 import { ColumnModel } from '*/models/column.model'
+import { BoardModel } from '*/models/board.model'
 
-const createNew = async (newColumn) => {
+const createNew = async (column) => {
   try {
-    const result = await ColumnModel.createNew(newColumn)
-    return result
+    const newColumn = await ColumnModel.createNew(column)
+    await BoardModel.pushColumnOrder(newColumn.boardId.toString(), newColumn._id.toString())
+
+    return newColumn
   } catch (error) {
     throw new Error(error)
   }
@@ -30,6 +33,7 @@ const softRemove = async (id) => {
     throw new Error(error)
   }
 }
+
 
 export const ColumnService = {
   createNew,
