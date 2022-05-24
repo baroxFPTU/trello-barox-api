@@ -16,11 +16,35 @@ const validateSchema = async (columnTarget) => {
   return await columnCollectionSchema.validateAsync(columnTarget, { abortEarly: false })
 }
 
-const createNew = async (newColumn) => {
+const createNew = async (column) => {
   try {
-    const vaildColumn = await validateSchema(newColumn)
-    const result = await getDB().collection(columnCollectionName).insertOne(vaildColumn)
-    return result
+    const vaildColumn = await validateSchema(column)
+    const insertColumn = {
+      ...vaildColumn,
+      boardId: ObjectId(vaildColumn.boardId)
+    }
+
+    const result = await getDB().collection(columnCollectionName).insertOne(insertColumn)
+    const newColumn = await getDB().collection(columnCollectionName).findOne({ _id: result.insertedId })
+    return newColumn
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
+/**
+ * @param {String} columnId
+ * @param {String} cardId
+ */
+const pushCardOrder = async (columnId, cardId) => {
+  try {
+    const updatedColumn = await getDB().collection(columnCollectionName).findOneAndUpdate(
+      { _id: ObjectId(columnId) },
+      { $push: { cardOrder: cardId } },
+      { returnDocument: 'after' }
+    )
+
+    return updatedColumn
   } catch (error) {
     throw new Error(error)
   }
@@ -33,7 +57,6 @@ const update = async (id, column) => {
       { $set: column },
       { returnDocument: 'after' }
     )
-    console.log(updatedColumn)
     return updatedColumn.value
   } catch (error) {
     throw new Error(error)
@@ -54,7 +77,9 @@ const softRemove = async (id) => {
 }
 
 export const ColumnModel = {
+  columnCollectionName,
   createNew,
   update,
+  pushCardOrder,
   softRemove
 }

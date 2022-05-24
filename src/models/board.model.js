@@ -1,5 +1,8 @@
 import Joi from 'joi'
 import { getDB } from '*/config/mongodb'
+import { ObjectId } from 'mongodb'
+import { ColumnModel } from './column.model'
+import { CardModel } from './card.model'
 
 const boardCollectionName = 'boards'
 const boardCollectionSchema = Joi.object({
@@ -14,18 +17,70 @@ const validateSchema = async (boardTarget) => {
   return await boardCollectionSchema.validateAsync(boardTarget, { abortEarly: false })
 }
 
-const createNew = async (newBoard) => {
+const createNew = async (board) => {
   try {
-    const validBoard = await validateSchema(newBoard)
+    const validBoard = await validateSchema(board)
     const result = await getDB().collection(boardCollectionName).insertOne(validBoard)
-    return result
+    const newBoard = await getDB().collection(boardCollectionName).findOne({ _id: result.insertedId })
+
+    return newBoard
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
+/**
+ * @param {String} boardId
+ * @param {String} columnId
+ */
+const pushColumnOrder = async (boardId, columnId) => {
+  try {
+    const updatedBoard = await getDB().collection(boardCollectionName).findOneAndUpdate(
+      { _id: ObjectId(boardId) },
+      { $push: { columnOrder: columnId } },
+      { returnDocument: 'after' }
+    )
+
+    return updatedBoard
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
+const getFullBoard = async (boardId) => {
+  try {
+    const board = await getDB().collection(boardCollectionName).aggregate([
+      {
+        $match: { _id: ObjectId(boardId) }
+      },
+      {
+        $lookup: {
+          from: ColumnModel.columnCollectionName,
+          localField: '_id',
+          foreignField: 'boardId',
+          as: 'columns'
+        }
+      },
+      {
+        $lookup: {
+          from: CardModel.cardCollectionName,
+          localField: '_id',
+          foreignField: 'boardId',
+          as: 'cards'
+        }
+      }
+    ]).toArray()
+
+    return board[0] || {}
   } catch (error) {
     throw new Error(error)
   }
 }
 
 export const BoardModel = {
-  createNew
+  createNew,
+  pushColumnOrder,
+  getFullBoard
 }
 
 /*

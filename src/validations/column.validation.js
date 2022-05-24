@@ -41,7 +41,6 @@ const softRemove = async (req, res, next) => {
   })
 
   try {
-    console.log(req.params)
     await condition.validateAsync(req.params, { abortEarly: true })
     next()
   } catch (error) {
