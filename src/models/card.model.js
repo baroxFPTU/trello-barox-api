@@ -34,7 +34,21 @@ const createNew = async (card) => {
   }
 }
 
+const softDeleteCards = async (cardIds) => {
+  const transformCardIds = cardIds.map(cardId => ObjectId(cardId))
+  try {
+    const result = await getDB().collection(cardCollectionName).updateMany(
+      { _id: { $in: transformCardIds } },
+      { $set: { _destroy: true } }
+    )
+    return result
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
 export const CardModel = {
   cardCollectionName,
-  createNew
+  createNew,
+  softDeleteCards
 }

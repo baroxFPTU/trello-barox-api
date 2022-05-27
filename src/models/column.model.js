@@ -54,7 +54,10 @@ const update = async (id, column) => {
   try {
     const updatedColumn = await getDB().collection(columnCollectionName).findOneAndUpdate(
       { _id: ObjectId(id) },
-      { $set: column },
+      { $set: {
+        ...column,
+        boardId: ObjectId(column.boardId)
+      } },
       { returnDocument: 'after' }
     )
     return updatedColumn.value
