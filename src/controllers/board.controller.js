@@ -12,6 +12,18 @@ const createNew = async (req, res) => {
   }
 }
 
+const update = async (req, res) => {
+  try {
+    const { id } = req.params
+    const updatedColumn = await BoardService.update(id, req.body)
+    res.status(HttpStatusCode.OK).json(updatedColumn)
+  } catch (error) {
+    res.status(HttpStatusCode.INTERNAL_SERVER).json({
+      errors: error?.message
+    })
+  }
+}
+
 const getFullBoard = async (req, res) => {
   const { id } = req.params
 
@@ -27,5 +39,6 @@ const getFullBoard = async (req, res) => {
 
 export const BoardController = {
   createNew,
+  update,
   getFullBoard
 }
