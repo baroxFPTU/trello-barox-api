@@ -20,8 +20,7 @@ const update = async (id, column) => {
       ...column,
       updatedAt: Date.now()
     }
-    // if (column.boardId)
-=======
+
     if (updatedColumn._id) delete updatedColumn._id
     if (updatedColumn.cards) delete updatedColumn.cards
 
