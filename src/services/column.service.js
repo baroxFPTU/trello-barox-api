@@ -18,6 +18,9 @@ const update = async (id, column) => {
       ...column,
       updatedAt: Date.now()
     }
+
+    // if (column.boardId)
+
     const result = await ColumnModel.update(id, updatedColumn)
     return result
   } catch (error) {
