@@ -41,7 +41,6 @@ const getFullBoard = async (boardId) => {
     })
 
     delete transformedBoard.cards
-
     return transformedBoard
   } catch (error) {
     throw new Error(error)

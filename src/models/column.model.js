@@ -52,12 +52,15 @@ const pushCardOrder = async (columnId, cardId) => {
 
 const update = async (id, column) => {
   try {
+    const updateColumn = {
+      ...column
+    }
+
+    if (column.boardId) updateColumn.boardId = ObjectId(column.boardId)
+
     const updatedColumn = await getDB().collection(columnCollectionName).findOneAndUpdate(
       { _id: ObjectId(id) },
-      { $set: {
-        ...column,
-        boardId: ObjectId(column.boardId)
-      } },
+      { $set: updateColumn },
       { returnDocument: 'after' }
     )
     return updatedColumn.value
