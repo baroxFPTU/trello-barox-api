@@ -34,6 +34,27 @@ const createNew = async (card) => {
   }
 }
 
+
+const update = async (cardId, newCard) => {
+  const updateCard = {
+    ...newCard
+  }
+
+  if (newCard.boardId) updateCard.boardId = ObjectId(newCard.boardId)
+  if (newCard.columnId) updateCard.columnId = ObjectId(newCard.columnId)
+
+  try {
+    const updatedBoard = await getDB().collection(cardCollectionName).findOneAndUpdate(
+      { _id: ObjectId(cardId) },
+      { $set: updateCard },
+      { returnDocument: 'after' }
+    )
+    return updatedBoard.value
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
 const softDeleteCards = async (cardIds) => {
   const transformCardIds = cardIds.map(cardId => ObjectId(cardId))
   try {
@@ -50,5 +71,6 @@ const softDeleteCards = async (cardIds) => {
 export const CardModel = {
   cardCollectionName,
   createNew,
+  update,
   softDeleteCards
 }

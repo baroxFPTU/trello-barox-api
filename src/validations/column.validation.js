@@ -19,7 +19,7 @@ const createNew = async (req, res, next) => {
 
 const update = async (req, res, next) => {
   const condition = Joi.object({
-    title: Joi.string().min(3).max(20)
+    title: Joi.string().min(3).max(20).trim()
   })
 
   try {
@@ -27,6 +27,7 @@ const update = async (req, res, next) => {
       abortEarly: false,
       allowUnknown: true
     })
+    console.log(req.body);
     next()
   } catch (error) {
     res.status(HttpStatusCode.BAD_REQUEST).json({

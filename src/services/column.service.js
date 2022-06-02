@@ -16,15 +16,18 @@ const createNew = async (column) => {
 
 const update = async (id, column) => {
   try {
-    const updatedColumn = {
+    const updateColumn = {
       ...column,
       updatedAt: Date.now()
     }
 
-    if (updatedColumn._id) delete updatedColumn._id
-    if (updatedColumn.cards) delete updatedColumn.cards
-
-    const result = await ColumnModel.update(id, updatedColumn)
+    if (updateColumn._id) delete updateColumn._id
+    if (updateColumn.cards) delete updateColumn.cards
+    if (updateColumn._cardId) {
+      await CardModel.update(updateColumn.cardId, { columnId: updateColumn._id })
+      delete updateColumn._cardId
+    }
+    const result = await ColumnModel.update(id, updateColumn)
 
     if (result._destroy) {
       await CardModel.softDeleteCards(result.cardOrder)
